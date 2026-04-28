@@ -1,6 +1,6 @@
 .env
 chroma_db/
-data/raw/
-data/processed/
+DATA/raw/
+DATA/processed/
 __pycache__/
 *.pyc

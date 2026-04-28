@@ -1,20 +1,11 @@
-# policy-LLM
+# socialpolicy-LLM
 
-A lightweight **Retrieval-Augmented Generation (RAG)** system for exploring policy documents, surveys, and scientific articles using an LLM.
+A lightweight **Retrieval-Augmented Generation (RAG)** LLM system built to answer basic social policy questions (eg: What is the value of social equality in creating policy?). Features include: 
 
-This project lets you:
 - Load your own documents (PDF, text)
 - Convert them into searchable embeddings
 - Ask questions and get answers grounded in your data
-
----
-
-## Features
-
-- Local document ingestion (PDF + text)
-- Vector search using ChromaDB
 - LLM responses via OpenRouter (Mistral)
-- Simple command-line interface
 - Modular structure for future local LLM integration
 
 ---
@@ -46,10 +37,6 @@ git clone https://github.com/YOUR_USERNAME/policy-LLM.git
 cd policy-LLM
 python -m pip install -r requirements.txt
 ```
-
----
-
-## Environment Setup
 
 Create a `.env` file in the root directory:
 
@@ -119,26 +106,7 @@ python SRC/chat.py
 - `.env` is not tracked in Git (contains API key)
 - `chroma_db/` is generated locally and not committed
 - `DATA/raw/` is ignored by default (your private data)
-
----
-
-## Limitations
-
 - PDF parsing quality varies (especially scientific papers)
 - Retrieval quality depends on chunking and embeddings
 - Not a fine-tuned model — uses RAG instead
 
----
-
-## Roadmap
-
-- Local LLM backend (GGUF / llama.cpp)
-- Improved chunking for scientific texts
-- Metadata filtering
-- Streaming responses
-
----
-
-## License
-
-MIT (or update as needed)
