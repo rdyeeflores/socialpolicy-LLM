@@ -1,10 +1,10 @@
 # socialpolicy-LLM
 
-A lightweight Large Language Model (LLM) system built to answer basic social policy questions, using Retrieval-Augmented Generation (RAG) to reduce hallucinations and produce grounded responses based on user-provided documents (PDF, txt, etc). This is done by converting documents into searchable embeddings, which must then be referenced wehn responding to a user query.  
+A lightweight retrieval-augmented LLM system for answering social policy questions based on user-provided  documents (PDF, TXT, etc.). Documents are converted into embeddings and retrieved at query time to produce grounded, lower-hallucination responses.
 
-- Ask questions and get answers grounded in your data
-- LLM responses via OpenRouter (Mistral)
-- Modular structure for future local LLM integration
+- Ask questions grounded in your data  
+- LLM responses via OpenRouter (Mistral)  
+- Modular design for future local LLM integration  
 
 ---
 
@@ -30,9 +30,9 @@ socialpolicy-LLM/
 
 ## Installation
 
-```
-git clone https://github.com/YOUR_USERNAME/policy-LLM.git
-cd policy-LLM
+```bash
+git clone https://github.com/YOUR_USERNAME/socialpolicy-LLM.git
+cd socialpolicy-LLM
 python -m pip install -r requirements.txt
 ```
 
@@ -48,18 +48,17 @@ OPENROUTER_API_KEY=your_api_key_here
 
 ### 1. Add Documents
 
-Place your files in:
+Place files in:
 
 ```
 DATA/raw/
 ```
 
-
 ---
 
-### 2. Build the Database
+### 2. Build Database
 
-```
+```bash
 python SRC/ingest.py
 ```
 
@@ -67,40 +66,22 @@ python SRC/ingest.py
 
 ### 3. Start Chat
 
-```
+```bash
 python SRC/chat.py
 ```
 
-Example questions:
+Example:
 
 ```
-What is the value of social equality in creating policy?
-
-```
-
----
-
-## Example Workflow
-
-```
-# Add file
-DATA/raw/ForecastBench.pdf
-
-# Ingest
-python SRC/ingest.py
-
-# Query
-python SRC/chat.py
+Why is social equality important?
 ```
 
 ---
 
 ## Notes
 
-- `.env` is not tracked in Git (contains API key)
-- `chroma_db/` is generated locally and not committed
-- `DATA/raw/` is ignored by default (your private data)
-- PDF parsing quality varies (especially scientific papers)
-- Retrieval quality depends on chunking and embeddings
-- Not a fine-tuned model — uses RAG instead
-
+- `.env` is not tracked (contains API keys)  
+- `chroma_db/` is generated locally and not committed  
+- PDF parsing quality may vary  
+- Retrieval quality depends on chunking and embeddings  
+- This is not a fine-tuned model; it uses RAG

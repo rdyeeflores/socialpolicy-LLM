@@ -2,6 +2,7 @@ from pathlib import Path
 from pypdf import PdfReader
 import chromadb
 from sentence_transformers import SentenceTransformer
+import hashlib
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 RAW_DIR = BASE_DIR / "DATA" / "raw"
@@ -24,12 +25,17 @@ def read_file(path):
     return None
 
 
-def chunk_text(text, size=800, overlap=200):
+def chunk_text(text, size=2000, overlap=300):
+    """
+    Approx ~500–1000 tokens depending on text density
+    """
     chunks = []
     start = 0
+    text_length = len(text)
 
-    while start < len(text):
-        chunk = text[start:start + size].strip()
+    while start < text_length:
+        end = start + size
+        chunk = text[start:end].strip()
 
         if chunk:
             chunks.append(chunk)
@@ -37,6 +43,14 @@ def chunk_text(text, size=800, overlap=200):
         start += size - overlap
 
     return chunks
+
+
+def make_doc_id(path, chunk_index):
+    """
+    Create stable unique ID using file path + chunk index
+    """
+    base = f"{path.resolve()}-{chunk_index}"
+    return hashlib.md5(base.encode()).hexdigest()
 
 
 def main():
@@ -59,13 +73,26 @@ def main():
 
         chunks = chunk_text(text)
 
+        # Batch embeddings (much faster)
+        embeddings = embedder.encode(chunks, show_progress_bar=False)
+
+        ids = []
+        metadatas = []
+
         for i, chunk in enumerate(chunks):
-            collection.upsert(
-                ids=[f"{path.name}-{i}"],
-                documents=[chunk],
-                embeddings=[embedder.encode(chunk).tolist()],
-                metadatas=[{"source": path.name, "chunk": i}],
-            )
+            ids.append(make_doc_id(path, i))
+            metadatas.append({
+                "source": path.name,
+                "chunk": i,
+                "path": str(path.resolve())
+            })
+
+        collection.upsert(
+            ids=ids,
+            documents=chunks,
+            embeddings=embeddings.tolist(),
+            metadatas=metadatas
+        )
 
         print(f"Ingested {path.name}: {len(chunks)} chunks\n")
 
