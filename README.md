@@ -1,19 +1,17 @@
 # socialpolicy-LLM
 
-A lightweight **Retrieval-Augmented Generation (RAG)** LLM system built to answer basic social policy questions (eg: What is the value of social equality in creating policy?). Features include: 
+A lightweight Large Language Model (LLM) system built to answer basic social policy questions, using Retrieval-Augmented Generation (RAG) to reduce hallucinations and produce grounded responses based on user-provided documents (PDF, txt, etc). This is done by converting documents into searchable embeddings, which must then be referenced wehn responding to a user query.  
 
-- Load your own documents (PDF, text)
-- Convert them into searchable embeddings
 - Ask questions and get answers grounded in your data
 - LLM responses via OpenRouter (Mistral)
 - Modular structure for future local LLM integration
 
 ---
 
-## Project Structure
+## Structure
 
 ```
-policy-LLM/
+socialpolicy-LLM/
 │
 ├── SRC/
 │   ├── ingest.py
@@ -56,9 +54,6 @@ Place your files in:
 DATA/raw/
 ```
 
-Supported formats:
-- `.pdf`
-- `.txt`
 
 ---
 
@@ -79,9 +74,8 @@ python SRC/chat.py
 Example questions:
 
 ```
-What is ForecastBench?
-What patterns appear in the survey data?
-Summarize the main findings of the article.
+What is the value of social equality in creating policy?
+
 ```
 
 ---
