@@ -20,6 +20,7 @@ socialpolicy-LLM/
 │   ├── ingest.py
 │   └── chat.py
 │
+├── .env (API key)
 ├── .gitignore
 ├── README.md
 └── requirements.txt
