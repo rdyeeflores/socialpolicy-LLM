@@ -20,7 +20,6 @@ socialpolicy-LLM/
 ├── DATA/
 │   └── raw/
 │
-├── mistral_test.py
 ├── requirements.txt
 ├── .gitignore
 └── README.md
