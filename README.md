@@ -13,16 +13,16 @@ A lightweight retrieval-augmented LLM system for answering social policy questio
 ```
 socialpolicy-LLM/
 │
+├── DATA/
+│   └── raw/
+│
 ├── SRC/
 │   ├── ingest.py
 │   └── chat.py
 │
-├── DATA/
-│   └── raw/
-│
-├── requirements.txt
 ├── .gitignore
-└── README.md
+├── README.md
+└── requirements.txt
 ```
 
 ---
