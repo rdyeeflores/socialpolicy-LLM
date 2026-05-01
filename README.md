@@ -73,7 +73,15 @@ python SRC/chat.py
 Example:
 
 ```
-Why is social equality important?
+1. How can social policy reduce income inequality?
+
+2. Should healthcare be free for all citizens?
+
+3. What are the advantages and disadvantages of welfare programs?
+
+4. How do governments design effective social policies? 
+
+5. How can social policy improve access to quality education?
 ```
 
 ---
