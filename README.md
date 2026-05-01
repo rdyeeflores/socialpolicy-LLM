@@ -23,7 +23,7 @@ socialpolicy-LLM/
 │   ├── ingest.py     # Reads files and builds a local vector database
 │   └── chat.py       # Retrieves context for chat and sends queries to an LLM
 │
-├── .env.example      # NOTW: Rename to .env and add your API key
+├── .env.template      # Copy to .env and add your API key
 ├── .gitignore
 ├── README.md
 └── requirements.txt
@@ -41,17 +41,17 @@ python -m pip install -r requirements.txt
 
 ### API Key Setup
 
-1. Open `.env.example`
+1. Open `.env.template`
 2. Add your API key:
 
 ```env
 OPENROUTER_API_KEY=your_api_key_here
 ```
 
-3. Rename the file:
+3. Copy it to `.env`:
 
-```
-.env.example → .env
+```bash
+cp env.template .env
 ```
 
 The project uses OpenRouter by default with a Mistral model. You can change the provider or model in `SRC/chat.py`.
@@ -103,6 +103,7 @@ How can social policy improve access to quality education?
 ## Notes
 
 - `.env` contains private API credentials and should not be committed
+- `env.template` is safe to commit because it only contains placeholders
 - `chroma_db/` is generated locally and should not be committed
 - `DATA/raw/` includes default text files and may also contain user-added documents
 - PDF parsing quality may vary
