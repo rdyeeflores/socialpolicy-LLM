@@ -4,6 +4,10 @@ import chromadb
 from sentence_transformers import SentenceTransformer
 import hashlib
 
+# NOTE:
+# This file does NOT require any API key.
+# It builds a local vector database from your documents.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 RAW_DIR = BASE_DIR / "DATA" / "raw"
 DB_DIR = str(BASE_DIR / "chroma_db")

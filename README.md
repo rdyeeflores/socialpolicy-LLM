@@ -1,10 +1,13 @@
 # socialpolicy-LLM
 
-A lightweight retrieval-augmented LLM system for answering social policy questions based on user-provided  documents (PDF, TXT, etc.). Documents are converted into embeddings and retrieved at query time to produce grounded, lower-hallucination responses.
+A lightweight retrieval-augmented LLM system for answering social policy questions based on user-provided  documents (PDF, TXT, etc.). Documents are converted into embeddings and retrieved at query time to produce grounded, lower-hallucination responses. 
 
-- Ask questions grounded in your data  
-- LLM responses via OpenRouter (Mistral)  
-- Modular design for future local LLM integration  
+- Ask questions grounded in your own data
+- LLM responses via OpenRouter using Mistral by default
+- Local document search with ChromaDB
+- Local embeddings with SentenceTransformers
+- Modular design for future local LLM integration
+
 
 ---
 
@@ -20,11 +23,35 @@ socialpolicy-LLM/
 │   ├── ingest.py
 │   └── chat.py
 │
-├── .env (API key)
+├── .env.example
 ├── .gitignore
 ├── README.md
 └── requirements.txt
 ```
+
+---
+
+## Important: Bring Your Own API Key
+
+This project does **not** include an API key.
+
+Each user must provide their own API key from OpenRouter or another compatible provider.
+
+By default, `SRC/chat.py` is configured for:
+
+```python
+MODEL = "mistralai/mistral-small-3.2-24b-instruct"
+```
+
+and:
+
+```python
+base_url="https://openrouter.ai/api/v1"
+```
+
+To use a different provider or model, update those lines in `SRC/chat.py`.
+
+Never commit your real API key to GitHub.
 
 ---
 
