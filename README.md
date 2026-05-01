@@ -54,7 +54,7 @@ OPENROUTER_API_KEY=your_api_key_here
 .env.example → .env
 ```
 
-The project uses :contentReference[oaicite:0]{index=0} by default with a Mistral model. You can change the provider or model in `SRC/chat.py`.
+The project uses OpenRouter by default with a Mistral model. You can change the provider or model in `SRC/chat.py`.
 
 ---
 
