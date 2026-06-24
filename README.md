@@ -112,21 +112,6 @@ Runs four evaluation sections in order from least to most RAG-dependent:
 3. **Response Quality** — heuristic scores for length, grounding, and refusal rate
 4. **RAG Retrieval Relevancy** — cosine similarity between queries and retrieved chunks
 
-To run a single section:
-
-```bash
-python SRC/evaluate.py --section ethics
-python SRC/evaluate.py --section nlp
-python SRC/evaluate.py --section quality
-python SRC/evaluate.py --section rag
-```
-
-To save results to a JSON file:
-
-```bash
-python SRC/evaluate.py --out results.json
-```
-
 ---
 
 ## Notes

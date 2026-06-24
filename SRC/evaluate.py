@@ -16,7 +16,6 @@ Usage
     python SRC/evaluate.py --section nlp        # NLP metrics only
     python SRC/evaluate.py --section quality    # response quality only
     python SRC/evaluate.py --section rag        # RAG relevancy only
-    python SRC/evaluate.py --out results.json   # save JSON report
 
 Dependencies (add to requirements.txt)
 ---------------------------------------
@@ -31,7 +30,6 @@ already configured in ingest.py / chat.py, reading from .env as usual.
 """
 
 import argparse
-import json
 import os
 import re
 import sys
@@ -663,11 +661,6 @@ def main():
         default="all",
         help="Which evaluation section to run (default: all)",
     )
-    parser.add_argument(
-        "--out",
-        default=None,
-        help="Path to save a JSON report (e.g. results.json)",
-    )
     args = parser.parse_args()
 
     embedder   = SentenceTransformer(EMBED_MODEL) if _RAG_OK else None
@@ -700,11 +693,6 @@ def main():
 
     report.summary = build_summary(report)
     print_summary(report.summary)
-
-    if args.out:
-        with open(args.out, "w", encoding="utf-8") as f:
-            json.dump(asdict(report), f, indent=2)
-        print(f"Report saved to {args.out}")
 
 
 if __name__ == "__main__":
