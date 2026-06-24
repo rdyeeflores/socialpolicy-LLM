@@ -1,6 +1,6 @@
 # socialpolicy-LLM
 
-A lightweight retrieval-augmented LLM system for answering social policy questions from document text. The system ingests documents, stores searchable embeddings locally, retrieves relevant passages, and uses an LLM to produce grounded responses.
+A lightweight retrieval-augmented generation (RAG) LLM system for answering social policy questions using document-grounded responses. The project ingests text, stores searchable embeddings locally, retrieves relevant passages, and uses an LLM to generate answers based on retrieved evidence. Answers can then be evaluated across a collection of performance measures.
 
 This project demonstrates:
 
@@ -8,6 +8,7 @@ This project demonstrates:
 - Local text embeddings with SentenceTransformers
 - LLM integration through OpenRouter using Mistral by default
 - Safe API-key handling with a user-modified `.env.example` file
+- Evaluation of retrieval and response quality, including ethics/bias checks, NLP metrics (ROUGE-L, BLEU, BERTScore), response-quality heuristics, and retrieval relevancy scoring
 
 ---
 
@@ -94,9 +95,9 @@ Example questions:
 ```
 How can social policy reduce income inequality?
 
-What are the advantages and disadvantages of welfare programs?
+What are the advantages and disadvantages of social welfare programs?
 
-How can social policy improve access to quality education?
+How can social policy improve access to quality healthcare?
 ```
 
 ### 4. Evaluate

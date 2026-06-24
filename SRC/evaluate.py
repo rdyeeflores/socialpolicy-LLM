@@ -97,7 +97,7 @@ CHROMA_PATH     = os.path.join(os.path.dirname(__file__), "..", "chroma_db")
 EMBED_MODEL     = "all-MiniLM-L6-v2"
 N_RESULTS       = 3
 OPENROUTER_BASE = "https://openrouter.ai/api/v1"
-LLM_MODEL       = os.getenv("OPENROUTER_MODEL", "mistralai/mistral-7b-instruct")
+LLM_MODEL       = os.getenv("OPENROUTER_MODEL", "mistralai/mistral-small-3.2-24b-instruct")
 
 
 def _get_chroma_collection():
@@ -127,18 +127,16 @@ def retrieve_context(query: str, embedder, collection) -> str:
 def retrieve_with_embeddings(query: str, embedder, collection) -> tuple[str, list]:
     """
     Return (context_string, list_of_chunk_embeddings).
-    Used by the RAG relevancy section to compute cosine similarity.
+    ChromaDB does not persist raw embeddings by default, so we retrieve the
+    documents normally and re-encode each chunk on the fly using the same
+    embedder — guaranteeing valid vectors for cosine similarity.
     """
     query_vec = embedder.encode([query]).tolist()
-    results   = collection.query(
-        query_embeddings=query_vec,
-        n_results=N_RESULTS,
-        include=["documents", "embeddings"],
-    )
-    docs       = results.get("documents",  [[]])[0]
-    embeddings = results.get("embeddings", [[]])[0]
-    context    = "\n\n".join(docs) if docs else ""
-    return context, embeddings
+    results   = collection.query(query_embeddings=query_vec, n_results=N_RESULTS)
+    docs      = results.get("documents", [[]])[0]
+    context   = "\n\n".join(docs) if docs else ""
+    chunk_embeddings = embedder.encode(docs).tolist() if docs else []
+    return context, chunk_embeddings
 
 
 def ask_llm(question: str, context: str, client: "OpenAI") -> str:
