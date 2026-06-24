@@ -21,7 +21,8 @@ socialpolicy-LLM/
 │
 ├── SRC/
 │   ├── ingest.py     # Reads files and builds a local vector database
-│   └── chat.py       # Retrieves context for chat and sends queries to an LLM
+│   ├── chat.py       # Retrieves context for chat and sends queries to an LLM
+│   └── evaluate.py   # Runs evaluation metrics against the RAG pipeline
 │
 ├── .env.template      # Copy to .env and add your API key
 ├── .gitignore
@@ -98,6 +99,34 @@ What are the advantages and disadvantages of welfare programs?
 How can social policy improve access to quality education?
 ```
 
+### 4. Evaluate
+
+```bash
+python SRC/evaluate.py
+```
+
+Runs four evaluation sections in order from least to most RAG-dependent:
+
+1. **Ethics / Bias** — demographic parity, ideological balance, harmful prompt refusal
+2. **NLP Metrics** — ROUGE-L, BLEU, BERTScore against reference answers
+3. **Response Quality** — heuristic scores for length, grounding, and refusal rate
+4. **RAG Retrieval Relevancy** — cosine similarity between queries and retrieved chunks
+
+To run a single section:
+
+```bash
+python SRC/evaluate.py --section ethics
+python SRC/evaluate.py --section nlp
+python SRC/evaluate.py --section quality
+python SRC/evaluate.py --section rag
+```
+
+To save results to a JSON file:
+
+```bash
+python SRC/evaluate.py --out results.json
+```
+
 ---
 
 ## Notes
@@ -109,3 +138,5 @@ How can social policy improve access to quality education?
 - PDF parsing quality may vary
 - Retrieval quality depends on document quality, chunking, and embeddings
 - This is not a fine-tuned model; it uses retrieval-augmented generation (RAG)
+- Run `SRC/evaluate.py` only after `SRC/ingest.py` has built the local database
+- `results.json` is generated locally if using `--out` and should not be committed
