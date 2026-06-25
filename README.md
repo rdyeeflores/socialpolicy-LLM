@@ -80,7 +80,7 @@ DATA/raw/
 python SRC/ingest.py
 ```
 
-This reads the documents, chunks the text, creates embeddings, and stores them in a local ChromaDB database.
+This takes time to read each document, chunk the text, create embeddings, and store everything in a local ChromaDB database.
 
 ---
 
@@ -95,7 +95,7 @@ Example questions:
 ```
 How can social policy reduce income inequality?
 
-What are the advantages and disadvantages of social welfare programs?
+What are some advantages of social welfare programs?
 
 How can social policy improve access to quality healthcare?
 ```

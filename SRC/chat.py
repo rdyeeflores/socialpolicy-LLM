@@ -172,7 +172,7 @@ Write a clear answer with:
 ## Creates terminal interface
 def main():
     print("Policy LLM")
-    print("Type 'exit' or 'quit' to stop.")
+    print("Type 'exit' to stop.")
     print("Type 'debug off' to hide retrieved context previews.")
     print("Type 'debug on' to show retrieved context previews.")
     print()
@@ -180,7 +180,7 @@ def main():
     debug = True
 
     while True:
-        question = input("You: ").strip()
+        question = input("You ('exit' to stop): ").strip()
 
         if not question:
             continue
