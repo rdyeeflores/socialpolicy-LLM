@@ -1,6 +1,9 @@
+
+## Set-up
 import os
 from pathlib import Path
 
+## Main tools (local vector db, API, openai, transformer)
 import chromadb
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -24,6 +27,7 @@ COLLECTION = "policy_docs"
 #    If you switch, update base_url + model
 # ============================================
 
+## Loading API key and LLM set-up
 load_dotenv(BASE_DIR / ".env")
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
@@ -37,11 +41,12 @@ llm = OpenAI(
     api_key=API_KEY,
 )
 
+## Embedding and database set-up
 embedder = SentenceTransformer("all-MiniLM-L6-v2")
 db = chromadb.PersistentClient(path=DB_DIR)
 collection = db.get_or_create_collection(COLLECTION)
 
-
+## Retrieval specifications
 def retrieve(question, n=5):
     query_embedding = embedder.encode(question).tolist()
 
@@ -66,6 +71,7 @@ def retrieve(question, n=5):
     if not docs:
         return ""
 
+    ## Building the context
     context_parts = []
 
     for i, doc in enumerate(docs):
@@ -84,7 +90,7 @@ def retrieve(question, n=5):
 
     return "\n\n---\n\n".join(context_parts)
 
-
+## Previewing context
 def preview_context(context, max_chars=400, max_chunks=2):
     parts = context.split("\n\n---\n\n")[:max_chunks]
     short = "\n\n---\n\n".join(parts)
@@ -94,7 +100,7 @@ def preview_context(context, max_chars=400, max_chunks=2):
 
     return short
 
-
+## MAIN ANSWERING FUNCTION
 def ask(question, debug=True):
     context = retrieve(question)
 
@@ -106,6 +112,7 @@ def ask(question, debug=True):
     if not context:
         return "The provided context is not sufficient to answer this."
 
+    ## RAG prompt sent to model
     messages = [
         {
             "role": "system",
@@ -133,6 +140,7 @@ Write a clear answer with:
         },
     ]
 
+    ## Calling the LLM
     try:
         response = llm.chat.completions.create(
             model=MODEL,
@@ -141,6 +149,7 @@ Write a clear answer with:
             temperature=0.3,
         )
 
+        ## Response validation
         if not response or not response.choices:
             print("\n--- RAW LLM RESPONSE ---")
             print(response)
@@ -160,7 +169,7 @@ Write a clear answer with:
     except Exception as e:
         return f"LLM request failed: {e}"
 
-
+## Creates terminal interface
 def main():
     print("Policy LLM")
     print("Type 'exit' or 'quit' to stop.")
@@ -195,6 +204,6 @@ def main():
         print(ask(question, debug=debug))
         print()
 
-
+## Script entry point
 if __name__ == "__main__":
     main()

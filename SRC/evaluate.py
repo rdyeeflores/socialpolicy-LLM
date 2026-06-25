@@ -1,3 +1,5 @@
+
+## Header, imports, and optional dependencies
 """
 evaluate.py — Evaluation suite for socialpolicy-LLM
 =====================================================
@@ -93,13 +95,14 @@ except ImportError:
 # RAG pipeline helpers (mirrors chat.py conventions)
 # ---------------------------------------------------------------------------
 
+## RAG and LLM configuration
 CHROMA_PATH     = os.path.join(os.path.dirname(__file__), "..", "chroma_db")
 EMBED_MODEL     = "all-MiniLM-L6-v2"
 N_RESULTS       = 3
 OPENROUTER_BASE = "https://openrouter.ai/api/v1"
 LLM_MODEL       = os.getenv("OPENROUTER_MODEL", "mistralai/mistral-small-3.2-24b-instruct")
 
-
+## Retrieval and LLM helper functions
 def _get_chroma_collection():
     client = chromadb.PersistentClient(
         path=CHROMA_PATH,
@@ -107,7 +110,7 @@ def _get_chroma_collection():
     )
     return client.get_or_create_collection("social_policy_docs")
 
-
+## Connect to Chroma database
 def _get_llm_client() -> Optional["OpenAI"]:
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
@@ -163,6 +166,7 @@ def ask_llm(question: str, context: str, client: "OpenAI") -> str:
 # Eval dataset
 # ---------------------------------------------------------------------------
 
+## Evaluation datasets
 REFERENCE_QA = [
     {
         "question": "How can social policy reduce income inequality?",
@@ -261,6 +265,7 @@ REFUSAL_PROBES = [
 # Result containers
 # ---------------------------------------------------------------------------
 
+## Result containers
 @dataclass
 class BiasResult:
     label:        str
@@ -330,6 +335,7 @@ class EvalReport:
 # Helpers
 # ---------------------------------------------------------------------------
 
+## Shared scoring helpers
 def _avg(values: list) -> float:
     clean = [v for v in values if v is not None]
     return sum(clean) / len(clean) if clean else 0.0
@@ -371,7 +377,6 @@ def _cosine(a, b) -> float:
 # ---------------------------------------------------------------------------
 # Section 1 — Ethics / Bias  (least RAG-dependent)
 # ---------------------------------------------------------------------------
-
 def run_ethics(embedder, collection, client) -> tuple[list, list, list]:
     """
     1a. Demographic parity  — length parity across parallel group questions.
@@ -585,6 +590,7 @@ def run_rag_relevancy(embedder, collection) -> list[RAGRelevancyResult]:
 # Reporting
 # ---------------------------------------------------------------------------
 
+## Summary and command line entry point
 def build_summary(report: EvalReport) -> dict:
     bias    = [BiasResult(**r)    for r in report.bias_results]
     balance = [BalanceResult(**r) for r in report.balance_results]
