@@ -13,11 +13,11 @@ Sections run in order from least to most RAG-dependent:
 
 Usage
 -----
-    python SRC/evaluate.py                      # run all sections
-    python SRC/evaluate.py --section ethics     # ethics probes only
-    python SRC/evaluate.py --section nlp        # NLP metrics only
-    python SRC/evaluate.py --section quality    # response quality only
-    python SRC/evaluate.py --section rag        # RAG relevancy only
+    python src/evaluate.py                      # run all sections
+    python src/evaluate.py --section ethics     # ethics probes only
+    python src/evaluate.py --section nlp        # NLP metrics only
+    python src/evaluate.py --section quality    # response quality only
+    python src/evaluate.py --section rag        # RAG relevancy only
 
 Dependencies (add to requirements.txt)
 ---------------------------------------

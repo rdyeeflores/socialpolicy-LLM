@@ -17,10 +17,10 @@ This project demonstrates:
 ```
 socialpolicy-LLM/
 │
-├── DATA/
+├── data/
 │   └── raw/          # Includes default files; more could be added here (.pdf or .txt) 
 │
-├── SRC/
+├── src/
 │   ├── ingest.py     # Reads files and builds a local vector database
 │   ├── chat.py       # Retrieves context for chat and sends queries to an LLM
 │   └── evaluate.py   # Runs evaluation metrics against the RAG pipeline
@@ -67,7 +67,7 @@ The project uses OpenRouter by default with a Mistral model. You can change the 
 Place `.txt` or `.pdf` files in:
 
 ```
-DATA/raw/
+data/raw/
 ```
 
 (Default files are already included.)
@@ -77,7 +77,7 @@ DATA/raw/
 ### 2. Build the Local Database
 
 ```bash
-python SRC/ingest.py
+python src/ingest.py
 ```
 
 This takes time to read each document, chunk the text, create embeddings, and store everything in a local ChromaDB database.
@@ -87,7 +87,7 @@ This takes time to read each document, chunk the text, create embeddings, and st
 ### 3. Start Chat
 
 ```bash
-python SRC/chat.py
+python src/chat.py
 ```
 
 Example questions:
@@ -103,7 +103,7 @@ How can social policy improve access to quality healthcare?
 ### 4. Evaluate
 
 ```bash
-python SRC/evaluate.py
+python src/evaluate.py
 ```
 
 Runs four evaluation sections in order from least to most RAG-dependent:
@@ -124,5 +124,5 @@ Runs four evaluation sections in order from least to most RAG-dependent:
 - PDF parsing quality may vary
 - Retrieval quality depends on document quality, chunking, and embeddings
 - This is not a fine-tuned model; it uses retrieval-augmented generation (RAG)
-- Run `SRC/evaluate.py` only after `SRC/ingest.py` has built the local database
+- Run `src/evaluate.py` only after `src/ingest.py` has built the local database
 - `results.json` is generated locally if using `--out` and should not be committed

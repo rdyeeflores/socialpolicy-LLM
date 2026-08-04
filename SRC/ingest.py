@@ -8,7 +8,7 @@ import hashlib
 
 # NOTE: No API needed here due to local approach
 BASE_DIR = Path(__file__).resolve().parent.parent
-RAW_DIR = BASE_DIR / "DATA" / "raw"
+RAW_DIR = BASE_DIR / "data" / "raw"
 DB_DIR = str(BASE_DIR / "chroma_db")
 COLLECTION = "policy_docs"
 
