@@ -1,16 +1,9 @@
 # socialpolicy-LLM
 
-Evaluation is essential for trustworthy AI and retrieval-augmented generation (RAG) helps produce grounded LLM responses. This project integrates these two components to create an LLM-based  system to answer social policy questions from source documents—and evaluate whether those answers are grounded, consistent, adaptable, correctable, and responsible.
+Evaluation is essential for trustworthy AI and retrieval-augmented generation (RAG) helps produce grounded responses. This project integrates these two components to create a customizable LLM-based system to answer social policy questions from source documents—and evaluate whether those answers are grounded, consistent, adaptable, correctable, and responsible.
 
-This repository emphasizes **LLM evaluation**, not just answer generation. It demonstrates how a RAG system can be tested with automated metrics, targeted scenarios, configurable thresholds, structured reporting, and optional human review.
+This project emphasizes **LLM evaluation**, not just answer generation. It demonstrates how a RAG system can be tested with automated metrics, targeted benchmarks/scenarios, configurable thresholds, structured reporting, and optional human review.
 
-- LLM and RAG evaluation
-- Grounded question answering
-- Benchmark and scenario design
-- Reliability and robustness testing
-- Responsible AI and fairness checks
-- Human-in-the-loop evaluation
-- Reproducible Python workflows
 
 ## Evaluation Framework
 
@@ -29,7 +22,7 @@ The framework does not force unrelated metrics into one score. It reports catego
 ## System Design
 
 ```text
-Source documents
+Source documents 
       ↓
 Text chunking and embeddings
       ↓
@@ -50,15 +43,6 @@ The generation prompt requires the model to:
 - Represent uncertainty when appropriate
 - Abstain when the context is insufficient
 
-## Technology Stack
-
-- **Python**
-- **ChromaDB** for local vector search
-- **SentenceTransformers** using `all-MiniLM-L6-v2`
-- **OpenRouter** through the OpenAI Python client
-- **ROUGE-L, BLEU, and BERTScore**
-- **NumPy and PyTorch**
-- **python-dotenv** for configuration
 
 ## Repository Structure
 
@@ -107,12 +91,6 @@ Run the full evaluation suite:
 python src/evaluate.py
 ```
 
-Run one category:
-
-```bash
-python src/evaluate.py --section reliability
-```
-
 Save detailed results and create a human-review template:
 
 ```bash
@@ -127,6 +105,7 @@ The evaluator prints a hiring-manager-friendly summary after all selected tests 
 ========================================================================
 SOCIAL-POLICY LLM EVALUATION SCORECARD
 ========================================================================
+
   Competency
     status               PASS
     coverage             3 metrics | 3 scenarios
@@ -160,16 +139,11 @@ SOCIAL-POLICY LLM EVALUATION SCORECARD
     harmful-premise handling  0.92
     comparable-group parity    0.81
     ideological balance        0.76
+
 ========================================================================
 ```
 
 `PASS` indicates that configured thresholds were met. `REVIEW` flags categories that need inspection, and `FAIL` indicates that most threshold checks were missed. 
-
-## Evaluation Outputs
-
-- Terminal scorecard with category indicators and status
-- JSON report with scenario-level metrics and thresholds
-- Optional CSV template for expert review and notes
 
 ## Scope
 
