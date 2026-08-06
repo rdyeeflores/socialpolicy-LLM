@@ -9,15 +9,24 @@ This project **emphasizes LLM evaluation**, not just answer generation. It demon
 
 The evaluation suite measures five categories:
 
-| Category | What it tests |
-|---|---|
-| **Competency** | Retrieval relevance, answer grounding, concept coverage, and similarity to reference answers |
-| **Reliability** | Stability across repeated runs and consistency across paraphrased questions |
-| **Adaptability** | Ability to follow audience, jurisdiction, and ethical-framing instructions without losing grounding |
-| **Recoverability** | Ability to improve overconfident, one-sided, or unsupported answers after corrective feedback |
-| **Conformity** | Fair treatment across groups, balanced policy framing, and appropriate handling of harmful or unsupported premises |
+| Category | What it tests | Method |
+|---|---|---|
+| **Competency** | Retrieval relevance, answer grounding, concept coverage, and similarity to reference answers | Cosine similarity between query and retrieved-document embeddings (retrieval relevance); lexical overlap between the answer and retrieved context, stopword-filtered (grounding — a proxy for evidence use, not an entailment measure); ROUGE-L, BLEU, and BERTScore F1 computed jointly against reference answers rather than any single metric alone |
+| **Reliability** | Stability across repeated runs and consistency across paraphrased questions | Two independent stability checks: retrieval stability (Jaccard overlap of retrieved document IDs across repeated runs) and answer stability (embedding similarity of repeated, temperature-0 answers), plus a separate paraphrase-invariance check and an answer-length coefficient of variation |
+| **Adaptability** | Ability to follow audience, jurisdiction, and ethical-framing instructions without losing grounding | Weighted composite of required-instruction term coverage, preservation of the original question's core terms, and context grounding, so surface compliance can't substitute for an on-topic, grounded answer |
+| **Recoverability** | Ability to improve overconfident, one-sided, or unsupported answers after corrective feedback | Before/after correction compared with a weighted fit score (desired language, avoidance of forbidden overclaims, appropriate qualification, grounding); a correction only counts as successful if fit clears a threshold, improvement is positive, *and* abstention is correct on cases where the fact is unsupported |
+| **Conformity** | Fair treatment across groups, balanced policy framing, and appropriate handling of harmful or unsupported premises | Matched-pair prompts (e.g. urban vs. rural, employed vs. unemployed; pro vs. con framings) scored on response-length parity, semantic similarity, and grounding balance between the pair; harmful or leading premises are separately checked for premise-challenging language rather than compliance |
 
 The framework does not force unrelated metrics into one score. It reports category-level indicators with `PASS`, `REVIEW`, or `FAIL` status, plus scenario-level diagnostics.
+
+### Design notes
+
+- **Reliability tests two independent failure modes, not one.** A RAG system can be unstable because retrieval keeps surfacing different documents, because generation phrases the same evidence differently, or both. This suite scores retrieval stability and answer stability separately instead of collapsing them into a single "consistency" number.
+- **Every category runs on matched or paired scenarios**, not isolated prompts: paraphrase pairs (reliability), instruction variants of the same base question (adaptability), before/after correction pairs (recoverability), and demographic/ideological pairs (conformity). Holding the underlying question constant while varying one condition is what makes the comparison interpretable.
+- **Abstention is a first-class tested behavior**, not an incidental side effect. One recoverability case asks about a fact that cannot exist in the corpus (a fictional country and year) specifically to check whether the system invents a statistic rather than declining to answer.
+- **Correction success requires more than a higher score.** A recoverability case only passes if the corrected answer clears a minimum fit threshold, shows a positive improvement over the initial answer, *and* abstains correctly when the underlying fact is unsupported — so a more fluent but still-overconfident correction won't pass.
+- **Scoring weights are explicit and stated, not hidden.** Composite scores (e.g. adaptability's instruction adherence, recoverability's fit score, conformity's fairness and balance scores) are documented weighted sums of interpretable sub-scores, so the basis for a PASS/REVIEW/FAIL can be inspected and re-weighted rather than trusted as a black box.
+- **Grounding is stated as a proxy, deliberately.** Lexical overlap between an answer and its retrieved context is cheap and interpretable, but it is not a factual-entailment check. It's reported alongside reference-based metrics (ROUGE-L/BLEU/BERTScore) rather than presented as a standalone correctness score.
 
 ## System Design
 
@@ -33,6 +42,8 @@ Top-k document retrieval
 OpenRouter LLM response (API)
       ↓
 Five-category evaluation suite
+      ↓
+Scorecard + optional JSON / human-review CSV export
 ```
 
 The generation prompt requires the model to:
