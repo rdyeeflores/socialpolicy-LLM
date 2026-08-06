@@ -35,14 +35,14 @@ coverage-table column.
 
 Usage
 -----
-    python SRC/evaluate.py
-    python SRC/evaluate.py --section competency
-    python SRC/evaluate.py --section reliability
-    python SRC/evaluate.py --section adaptability
-    python SRC/evaluate.py --section recoverability
-    python SRC/evaluate.py --section conformity
-    python SRC/evaluate.py --out results.json
-    python SRC/evaluate.py --human-review-out human_review.csv
+    python src/evaluate.py
+    python src/evaluate.py --section competency
+    python src/evaluate.py --section reliability
+    python src/evaluate.py --section adaptability
+    python src/evaluate.py --section recoverability
+    python src/evaluate.py --section conformity
+    python src/evaluate.py --out results.json
+    python src/evaluate.py --human-review-out human_review.csv
 
 Dependencies
 ------------
@@ -80,10 +80,16 @@ from typing import Any, Optional, Sequence
 
 from dotenv import load_dotenv
 
+# SIGNIFICANT: Resolve repository-relative paths once so the evaluator can be
+# launched from different working directories without changing where it looks
+# for the .env file, Chroma database, or other repository assets.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
 
 # ---------------------------------------------------------------------------
+# SIGNIFICANT: Evaluation dependencies are deliberately soft-failed. This lets
+# the script report which metrics are unavailable instead of crashing at import
+# time, while the core RAG/LLM prerequisites are enforced later in main().
 # Optional imports
 # ---------------------------------------------------------------------------
 
@@ -152,6 +158,10 @@ except ImportError:
     transformers_logging = None
 
 # ---------------------------------------------------------------------------
+# SIGNIFICANT: These constants are the evaluator's integration contract with the
+# target repository. Changing the collection, embedding model, retrieval depth,
+# generation model, repeat count, or thresholds directly changes what is tested
+# and how category outcomes are judged.
 # Repository-compatible configuration
 # ---------------------------------------------------------------------------
 
@@ -169,6 +179,9 @@ SLEEP_SECONDS = float(os.getenv("EVAL_SLEEP_SECONDS", "0.35"))
 
 INSUFFICIENT_TEXT = "The provided context is not sufficient to answer this."
 
+# SIGNIFICANT: Category PASS/REVIEW/FAIL decisions ultimately depend on these
+# practical cutoffs. They are policy choices rather than universal standards,
+# so they should be calibrated against known-good and known-bad system outputs.
 THRESHOLDS = {
     "retrieval_relevance": 0.50,
     "answer_grounding": 0.45,
@@ -185,6 +198,9 @@ THRESHOLDS = {
 
 
 # ---------------------------------------------------------------------------
+# SIGNIFICANT: These scenario collections are the benchmark specification. Each
+# category measures a distinct behavior, and the prompts, reference concepts,
+# correction instructions, and paired cases determine the evaluator's coverage.
 # Evaluation scenarios
 # ---------------------------------------------------------------------------
 
@@ -397,6 +413,9 @@ HARMFUL_OR_LEADING_PROMPTS = [
 
 
 # ---------------------------------------------------------------------------
+# SIGNIFICANT: Typed dataclasses establish the internal result schema. They keep
+# scenario-level diagnostics, category summaries, JSON output, and console output
+# synchronized without passing loosely structured dictionaries through the code.
 # Result containers
 # ---------------------------------------------------------------------------
 
@@ -474,9 +493,14 @@ class EvalReport:
 
 
 # ---------------------------------------------------------------------------
+# SIGNIFICANT: This section reproduces the production retrieval-and-generation
+# path being evaluated. The usefulness of every downstream score depends on this
+# layer matching the actual repository's Chroma and OpenRouter behavior.
 # Pipeline helpers
 # ---------------------------------------------------------------------------
 
+# Opens the persistent vector store used by the application. Returning None when
+# dependencies are absent defers a clear, user-facing failure to main().
 def get_collection():
     if not _RAG_OK:
         return None
@@ -494,6 +518,9 @@ def get_llm_client() -> Optional["OpenAI"]:
         return None
     return OpenAI(api_key=api_key, base_url=OPENROUTER_BASE)
 
+# Core retrieval step: embed the question, query Chroma, preserve identifiers and
+# distances for reliability metrics, and assemble source-labelled context for the
+# grounded answer prompt.
 def retrieve(question: str, embedder, collection, n_results: int = N_RESULTS) -> RetrievalResult:
     if not (_RAG_OK and embedder and collection):
         return RetrievalResult(question=question)
@@ -526,6 +553,9 @@ def retrieve(question: str, embedder, collection, n_results: int = N_RESULTS) ->
         distances=[float(x) for x in distances],
     )
 
+# Core generation step: force document-grounded answering, explicit uncertainty,
+# and a canonical abstention sentence. extra_instruction is how adaptability and
+# recoverability tests alter behavior without changing the base pipeline.
 def ask_llm(
     question: str,
     context: str,
@@ -573,6 +603,9 @@ def ask_llm(
 
 
 # ---------------------------------------------------------------------------
+# SIGNIFICANT: These functions translate model and retrieval behavior into
+# measurable signals. The suite intentionally combines semantic, lexical,
+# structural, and rule-based measures rather than relying on one universal score.
 # Scoring helpers
 # ---------------------------------------------------------------------------
 
@@ -639,6 +672,9 @@ def retrieval_relevance(question: str, documents: Sequence[str], embedder) -> fl
     return average([cosine_vectors(query_vector, vector) for vector in document_vectors])
 
 
+# Approximate grounding by measuring the share of answer content words found in
+# retrieved context. This is inexpensive and interpretable, but lexical overlap
+# is only a proxy for factual entailment and should be read with other metrics.
 def grounding_overlap(answer: str, context: str) -> float:
     answer_terms = set(tokens(answer))
     context_terms = set(tokens(context))
@@ -707,6 +743,8 @@ def sleep_briefly() -> None:
         time.sleep(SLEEP_SECONDS)
 
 
+# Converts threshold checks into the three-level category status: all checks pass
+# => PASS, fewer than half pass => FAIL, otherwise => REVIEW.
 def summary_status_from_checks(checks: Sequence[bool]) -> str:
     active_checks = [bool(check) for check in checks]
     if not active_checks:
@@ -728,6 +766,9 @@ def summary_status_from_checks(checks: Sequence[bool]) -> str:
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 
+# CATEGORY 1 — COMPETENCY
+# Tests whether ordinary policy questions retrieve relevant evidence and produce
+# grounded, conceptually adequate answers that resemble compact references.
 def run_competency(embedder, collection, client) -> list[CompetencyResult]:
     print("\n=== [1/5] COMPETENCY ===")
     results: list[CompetencyResult] = []
@@ -792,6 +833,9 @@ def run_competency(embedder, collection, client) -> list[CompetencyResult]:
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 
+# CATEGORY 2 — RELIABILITY
+# Repeats identical inputs and compares meaning-preserving paraphrases. It checks
+# stability of both retrieved document IDs and generated answer semantics.
 def run_reliability(embedder, collection, client) -> list[ReliabilityResult]:
     print("\n=== [2/5] RELIABILITY ===")
     results: list[ReliabilityResult] = []
@@ -858,6 +902,9 @@ def run_reliability(embedder, collection, client) -> list[ReliabilityResult]:
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 
+# CATEGORY 3 — ADAPTABILITY
+# Adds audience, jurisdiction, or ethical-framing constraints and measures whether
+# the answer follows them while preserving the original task and its grounding.
 def run_adaptability(embedder, collection, client) -> list[AdaptabilityResult]:
     print("\n=== [3/5] ADAPTABILITY ===")
     results: list[AdaptabilityResult] = []
@@ -876,6 +923,8 @@ def run_adaptability(embedder, collection, client) -> list[AdaptabilityResult]:
         grounded = grounding_overlap(answer, retrieved.context)
 
         # Balanced practical adherence: requested form, task preservation, and grounding.
+        # Weighted composite: requested features receive the most weight, while
+        # task preservation and evidence grounding prevent superficial compliance.
         adherence = 0.45 * required + 0.25 * preserved + 0.30 * grounded
 
         result = AdaptabilityResult(
@@ -900,6 +949,10 @@ def run_adaptability(embedder, collection, client) -> list[AdaptabilityResult]:
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 
+# CATEGORY 4 — RECOVERABILITY
+# Compares an initial answer with a second answer produced after explicit feedback.
+# Success requires adequate corrected fit, positive improvement, and abstention
+# when the requested fact is unsupported.
 def run_recoverability(embedder, collection, client) -> list[RecoverabilityResult]:
     print("\n=== [4/5] RECOVERABILITY ===")
     results: list[RecoverabilityResult] = []
@@ -915,6 +968,8 @@ def run_recoverability(embedder, collection, client) -> list[RecoverabilityResul
             extra_instruction=case["correction"],
         )
 
+        # Local scoring model for correction quality: desired language, avoidance
+        # of forbidden claims, appropriate qualification, and context grounding.
         def fit(answer: str) -> float:
             desired = term_coverage(answer, case["desired_terms"])
             forbidden = forbidden_pass(answer, case["forbidden_terms"])
@@ -969,6 +1024,9 @@ def run_recoverability(embedder, collection, client) -> list[RecoverabilityResul
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 
+# CATEGORY 5 — CONFORMITY
+# Evaluates proportional treatment of comparable groups, balance across opposing
+# policy framings, and safe handling of harmful, leading, or unsupported premises.
 def run_conformity(embedder, collection, client) -> list[ConformityResult]:
     print("\n=== [5/5] CONFORMITY ===")
     results: list[ConformityResult] = []
@@ -1074,9 +1132,14 @@ def run_conformity(embedder, collection, client) -> list[ConformityResult]:
 
 
 # ---------------------------------------------------------------------------
+# SIGNIFICANT: Scenario-level metrics are aggregated here into decision-oriented
+# category indicators. This is the bridge between raw diagnostics and the final
+# scorecard status consumed by a reviewer.
 # Category summaries
 # ---------------------------------------------------------------------------
 
+# Each category intentionally exposes a small set of interpretable indicators
+# rather than collapsing unlike measurements into one global numeric score.
 def build_summaries(report: EvalReport) -> list[CategorySummary]:
     summaries: list[CategorySummary] = []
 
@@ -1232,6 +1295,9 @@ def build_summaries(report: EvalReport) -> list[CategorySummary]:
 
 
 # ---------------------------------------------------------------------------
+# SIGNIFICANT: Automated metrics cannot fully judge correctness, usefulness,
+# fairness, or nuance. This optional CSV creates a parallel structured workflow
+# for human ratings without mixing subjective ratings into automated coverage.
 # Human-review workflow
 # ---------------------------------------------------------------------------
 
@@ -1331,6 +1397,8 @@ def write_human_review_csv(path: str) -> None:
 
 
 # ---------------------------------------------------------------------------
+# SIGNIFICANT: Console output supports immediate inspection; JSON preserves full
+# machine-readable diagnostics and thresholds for later analysis or CI artifacts.
 # Reporting/Output
 # ---------------------------------------------------------------------------
 
@@ -1380,6 +1448,8 @@ def print_scorecard(summaries: Sequence[CategorySummary]) -> None:
     )
 
 
+# Serializes every scenario result, category summary, and active threshold so a
+# saved report remains auditable and can be compared across evaluator runs.
 def write_json_report(report: EvalReport, path: str) -> None:
     payload = {
         "competency": [asdict(item) for item in report.competency],
@@ -1398,9 +1468,14 @@ def write_json_report(report: EvalReport, path: str) -> None:
 
 
 # ---------------------------------------------------------------------------
+# SIGNIFICANT: The command-line entry point validates runtime prerequisites, runs
+# one selected category or the full suite, builds summaries, prints the scorecard,
+# and optionally writes human-review and JSON artifacts.
 # CLI
 # ---------------------------------------------------------------------------
 
+# Orchestrates setup and execution. All external-service checks happen before any
+# category runs, preventing partial results caused by a missing key, model, or corpus.
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
@@ -1450,7 +1525,7 @@ def main() -> None:
 
     if collection_count == 0:
         print(
-            "[ERROR] The policy_docs collection is empty. Run python SRC/ingest.py first."
+            "[ERROR] The policy_docs collection is empty. Run python src/ingest.py first."
         )
         sys.exit(1)
 
@@ -1471,6 +1546,7 @@ def main() -> None:
     if args.section in ("conformity", "all"):
         report.conformity = run_conformity(embedder, collection, client)
 
+    # Final aggregation occurs only after the requested category runners finish.
     report.summaries = build_summaries(report)
     print_scorecard(report.summaries)
 

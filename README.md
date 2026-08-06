@@ -1,12 +1,8 @@
 # socialpolicy-LLM
 
-## Evaluation-First RAG for Grounded Social Policy Q&A
-
-A Python retrieval-augmented generation (RAG) project designed to answer social policy questions from source documents—and evaluate whether those answers are grounded, consistent, adaptable, correctable, and responsible.
+Evaluation is essential for trustworthy AI and retrieval-augmented generation (RAG) helps produce grounded LLM responses. This project integrates these two components to create an LLM-based  system to answer social policy questions from source documents—and evaluate whether those answers are grounded, consistent, adaptable, correctable, and responsible.
 
 This repository emphasizes **LLM evaluation**, not just answer generation. It demonstrates how a RAG system can be tested with automated metrics, targeted scenarios, configurable thresholds, structured reporting, and optional human review.
-
-## What This Project Demonstrates
 
 - LLM and RAG evaluation
 - Grounded question answering
@@ -78,7 +74,7 @@ socialpolicy-LLM/
 └── README.md
 ```
 
-## Quick Start
+## Installation
 
 ```bash
 git clone https://github.com/rdyeeflores/socialpolicy-LLM.git
@@ -167,7 +163,7 @@ SOCIAL-POLICY LLM EVALUATION SCORECARD
 ========================================================================
 ```
 
-`PASS` indicates that configured thresholds were met. `REVIEW` flags categories that need scenario-level inspection, and `FAIL` indicates that most threshold checks were missed. Full diagnostics can be exported to JSON.
+`PASS` indicates that configured thresholds were met. `REVIEW` flags categories that need inspection, and `FAIL` indicates that most threshold checks were missed. 
 
 ## Evaluation Outputs
 
