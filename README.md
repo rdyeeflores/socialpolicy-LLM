@@ -1,8 +1,8 @@
 # socialpolicy-LLM
 
-Evaluation is essential for trustworthy AI and retrieval-augmented generation (RAG) helps produce grounded responses. This project integrates these two components to create a customizable LLM-based system to answer social policy questions from source documents—and evaluate whether those answers are grounded, consistent, adaptable, correctable, and responsible.
+Evaluation is essential for trustworthy AI and retrieval-augmented generation (RAG) helps produce grounded responses. This Python project integrates these two components to create a **customizable LLM-based system** to answer social policy questions from source documents—and evaluate whether those answers are grounded, consistent, adaptable, correctable, and responsible.
 
-This project emphasizes **LLM evaluation**, not just answer generation. It demonstrates how a RAG system can be tested with automated metrics, targeted benchmarks/scenarios, configurable thresholds, structured reporting, and optional human review.
+This project **emphasizes LLM evaluation**, not just answer generation. It demonstrates how a system can be tested with automated metrics, targeted benchmarks/scenarios, configurable thresholds, structured reporting, and optional human review.
 
 
 ## Evaluation Framework
@@ -22,7 +22,7 @@ The framework does not force unrelated metrics into one score. It reports catego
 ## System Design
 
 ```text
-Source documents 
+Source documents
       ↓
 Text chunking and embeddings
       ↓
@@ -30,7 +30,7 @@ Local ChromaDB vector store
       ↓
 Top-k document retrieval
       ↓
-OpenRouter LLM response
+OpenRouter LLM response (API)
       ↓
 Five-category evaluation suite
 ```
@@ -67,25 +67,25 @@ python -m pip install -r requirements.txt
 cp .env.template .env
 ```
 
-Add your OpenRouter key to `.env`:
+This system is configured to a **Mistral** LLM with API calls serviced by **OpenRouter** (both of which can be modified). Add you own API key to `.env`:
 
 ```env
 OPENROUTER_API_KEY=your_api_key_here
 ```
 
-Build the local vector database:
+Build a local vector database based on the source documents:
 
 ```bash
 python src/ingest.py
 ```
 
-Run grounded Q&A:
+Run grounded Q&A with LLM:
 
 ```bash
 python src/chat.py
 ```
 
-Run the full evaluation suite:
+Run the full 5-category evaluation suite:
 
 ```bash
 python src/evaluate.py
@@ -99,7 +99,7 @@ python src/evaluate.py --out results.json --human-review-out human_review.csv
 
 ## Example Evaluation Scorecard
 
-The evaluator prints a hiring-manager-friendly summary after all selected tests run. The values below are **illustrative only** and are not reported benchmark results.
+The evaluator prints a summary after all tests are completed. The values below are **illustrative only** and are not reported benchmark results.
 
 ```text
 ========================================================================
