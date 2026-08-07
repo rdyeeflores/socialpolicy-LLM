@@ -1,10 +1,10 @@
 openai
-python-dotenv
-pypdf
 chromadb
 sentence-transformers
 transformers
 rouge-score
 sacrebleu
 bert-score
+python-dotenv
+pypdf
 numpy
