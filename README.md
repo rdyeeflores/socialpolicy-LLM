@@ -1,8 +1,8 @@
 # socialpolicy-LLM
 
-Evaluation is essential for trustworthy AI and retrieval-augmented generation (RAG) helps produce grounded responses. This Python project integrates these two components to create a **customizable LLM-based system** to answer social policy questions from source documents—and evaluate whether those answers are grounded, consistent, adaptable, correctable, and responsible.
+Evaluation is essential for building trustworthy AI systems, while retrieval-augmented generation (RAG) helps ground responses in source material. This Python project combines these two components to create a **customizable LLM-based system** for answering social policy questions and evaluating whether those answers are grounded, consistent, adaptable, correctable, and responsible. 
 
-This project **emphasizes LLM evaluation**, not just answer generation. It demonstrates how a system can be tested with automated metrics, targeted benchmarks/scenarios, configurable thresholds, structured reporting, and optional human review.
+This project **emphasizes LLM evaluation**, not just answer generation. It demonstrates how AI responses can be assessed using automated metrics, targeted benchmarks and scenarios, configurable thresholds, structured reporting, and optional human review.
 
 
 ## Evaluation Framework
@@ -50,17 +50,21 @@ The generation prompt requires the model to:
 
 ```text
 socialpolicy-LLM/
-├── data/raw/          # Source documents
+├── data/raw/          # Source document corpus
+|
 ├── src/
 │   ├── ingest.py      # Builds the local vector database
 │   ├── chat.py        # Generates document-grounded answers
-│   └── evaluate.py    # Runs the five-category evaluation suite
-├── .env.template
-├── requirements.txt
+│   └── evaluate.py    # Runs the 5-category evaluation suite
+|
+├── .env.template      # Copied and used for API key
+├── requirements.txt   
 └── README.md
 ```
 
 ## Installation
+
+Before running the project, install the required Python dependencies and create a local environment file for your API credentials. The .env.template file shows the required settings and the cp command copies it to a new .env file, where you can add your credentials securely.
 
 ```bash
 git clone https://github.com/rdyeeflores/socialpolicy-LLM.git
@@ -69,7 +73,7 @@ python -m pip install -r requirements.txt
 cp .env.template .env
 ```
 
-This system is configured to a **Mistral** LLM with API calls serviced by **OpenRouter** (both of which can be modified). Add you own API key to `.env`:
+This system is configured to a **Mistral** LLM hosted by **OpenRouter** (both of which can be modified). Add you own API key to `.env`:
 
 ```env
 OPENROUTER_API_KEY=your_api_key_here
@@ -138,7 +142,7 @@ SOCIAL-POLICY LLM EVALUATION SCORECARD
   Conformity
     status               PASS
     coverage             3 metrics | 9 scenarios
-    harmful-premise handling  0.92
+    harmful-premise handling   0.92
     comparable-group parity    0.81
     ideological balance        0.76
 
