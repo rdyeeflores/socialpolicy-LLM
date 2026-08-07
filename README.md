@@ -11,10 +11,10 @@ The evaluation suite measures five categories:
 
 | Category | What it tests | Method |
 |---|---|---|
-| **Competency** | Retrieval relevance, answer grounding, concept coverage, and similarity to reference answers | Cosine similarity between query and retrieved-document embeddings (retrieval relevance); lexical overlap between the answer and retrieved context, stopword-filtered (grounding — a proxy for evidence use, not an entailment measure); ROUGE-L, BLEU, and BERTScore F1 computed jointly against reference answers rather than any single metric alone |
-| **Reliability** | Stability across repeated runs and consistency across paraphrased questions | Two independent stability checks: retrieval stability (Jaccard overlap of retrieved document IDs across repeated runs) and answer stability (embedding similarity of repeated, temperature-0 answers), plus a separate paraphrase-invariance check and an answer-length coefficient of variation |
+| **Competency** | Retrieval relevance, answer grounding, concept coverage, and similarity to reference answers | Cosine similarity between query and retrieved-document embeddings (retrieval relevance); lexical overlap between the answer and retrieved context, stopword-filtered (grounding — a proxy for evidence use); ROUGE-L, BLEU, and BERTScore F1 computed jointly against reference answers rather than any single metric alone |
+| **Reliability** | Stability across repeated runs and consistency across paraphrased questions | Two independent stability checks: retrieval stability (Jaccard overlap of retrieved document IDs across repeated runs) and answer stability (embedding similarity of repeated, zero-temperature answers), plus a separate paraphrase-invariance check and an answer-length coefficient of variation |
 | **Adaptability** | Ability to follow audience, jurisdiction, and ethical-framing instructions without losing grounding | Weighted composite of required-instruction term coverage, preservation of the original question's core terms, and context grounding, so surface compliance can't substitute for an on-topic, grounded answer |
-| **Recoverability** | Ability to improve overconfident, one-sided, or unsupported answers after corrective feedback | Before/after correction compared with a weighted fit score (desired language, avoidance of forbidden overclaims, appropriate qualification, grounding); success requires fit above threshold *and* positive improvement, *and*, for one scenario built on a fact absent from the corpus, correct abstention rather than an invented statistic |
+| **Recoverability** | Ability to improve overly confident, one-sided, or unsupported answers after corrective feedback | Before/after correction compared with a weighted fit score (desired language, avoidance of forbidden overclaims, appropriate qualification, grounding); success requires fit above threshold *and* positive improvement, *and*, for one scenario built on a fact absent from the corpus, correct abstention rather than an invented statistic |
 | **Conformity** | Fair treatment across groups, balanced policy framing, and appropriate handling of harmful or unsupported premises | Matched-pair prompts (e.g. urban vs. rural, employed vs. unemployed; pro vs. con framings) scored on response-length parity, semantic similarity, and grounding balance between the pair; harmful or leading premises are separately checked for premise-challenging language rather than compliance |
 
 The framework does not force unrelated metrics into one score. It reports category-level indicators with `PASS`, `REVIEW`, or `FAIL` status, plus scenario-level diagnostics.
@@ -73,7 +73,7 @@ python -m pip install -r requirements.txt
 cp .env.template .env
 ```
 
-This system is configured to use **OpenAI GPT-5.6 Luna** through **OpenRouter** (both of which can be modified). Add you own API key to `.env`:
+This system is configured by default to use **OpenAI GPT-5.6 Luna** through **OpenRouter**, providing fast and cost-effective access to a frontier LLM. Add your own API key to the `.env` file:
 
 ```env
 OPENROUTER_API_KEY=your_api_key_here
@@ -85,13 +85,13 @@ Build a local vector database based on the source documents:
 python src/ingest.py
 ```
 
-Run grounded Q&A with LLM:
+Begin a grounded LLM Q&A session:
 
 ```bash
 python src/chat.py
 ```
 
-Run the full 5-category evaluation suite:
+Run a full 5-category evaluation suite:
 
 ```bash
 python src/evaluate.py
