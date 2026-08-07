@@ -3,8 +3,8 @@ python-dotenv
 pypdf
 chromadb
 sentence-transformers
+transformers
 rouge-score
 sacrebleu
 bert-score
-torch
 numpy

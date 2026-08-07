@@ -1,8 +1,8 @@
 # socialpolicy-LLM
 
-Evaluation is essential for building trustworthy AI systems, while retrieval-augmented generation (RAG) helps ground responses in source material. This Python project combines these two components to create a **customizable LLM-based system** for answering social policy questions and evaluating whether those answers are grounded, consistent, adaptable, correctable, and responsible. 
+Evaluation is essential for building trustworthy AI systems, while retrieval-augmented generation (RAG) helps ground responses in source material. This Python project combines these two components to create a **customizable system built around a frontier LLM** for answering social policy questions and evaluating whether those answers are grounded, consistent, adaptable, correctable, and responsible. 
 
-This project **emphasizes LLM evaluation**, not just answer generation. It demonstrates how AI responses can be assessed using automated metrics, targeted benchmarks and scenarios, configurable thresholds, structured reporting, and optional human review.
+This project **emphasizes frontier LLM evaluation**, not just answer generation. It demonstrates how AI responses can be assessed using automated metrics, targeted benchmarks and scenarios, configurable thresholds, structured reporting, and optional human review.
 
 
 ## Evaluation Framework
@@ -73,7 +73,7 @@ python -m pip install -r requirements.txt
 cp .env.template .env
 ```
 
-This system is configured to a **Mistral** LLM hosted by **OpenRouter** (both of which can be modified). Add you own API key to `.env`:
+This system is configured to use **OpenAI GPT-5.6 Luna** through **OpenRouter** (both of which can be modified). Add you own API key to `.env`:
 
 ```env
 OPENROUTER_API_KEY=your_api_key_here

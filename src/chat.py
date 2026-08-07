@@ -13,25 +13,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DB_DIR = str(BASE_DIR / "chroma_db")
 COLLECTION = "policy_docs"
 
-# ============================================
+# ==================================================
 # 🔑 USER SETUP REQUIRED
-# ============================================
+# ==================================================
 # 1. Create a .env file in the project root
 # 2. Add your API key like this:
 #
 #    OPENROUTER_API_KEY=your_key_here
 #
-# 3. (Optional) You may switch providers:
-#    - OpenRouter (default below)
-#    - OpenAI, Anthropic, etc.
-#    If you switch, update base_url + model
-# ============================================
+# 3. Optional: You may also switch model & provider:
+#    - Model: openai/gpt-5.6-luna (default)
+#    - Provider: OpenRouter (default)
+# ==================================================
 
 # Loading API key and LLM set-up
 load_dotenv(BASE_DIR / ".env")
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
-MODEL = "mistralai/mistral-small-3.2-24b-instruct"
+
+MODEL = "openai/gpt-5.6-luna"  # Change this to your preferred model if needed
 
 if not API_KEY:
     raise ValueError("Missing OPENROUTER_API_KEY in .env")
