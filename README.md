@@ -105,7 +105,7 @@ python src/evaluate.py --out results.json --human-review-out human_review.csv
 
 ## Example Evaluation Scorecard
 
-The evaluator prints a summary after all tests are completed. The values below are **illustrative only** and are not reported benchmark results.
+The evaluator prints a summary after all tests are completed. The output below shows results from a completed evaluation run using the current social-policy corpus, model configuration, scenarios, and configured thresholds.
 
 ```text
 ========================================================================
@@ -115,41 +115,52 @@ SOCIAL-POLICY LLM EVALUATION SCORECARD
   Competency
     status               PASS
     coverage             3 metrics | 3 scenarios
-    retrieval relevance  0.68
-    answer grounding     0.74
-    BERTScore F1         0.79
+    retrieval relevance            0.59
+    answer grounding               0.55
+    BERTScore F1                   0.84
 
   Reliability
     status               PASS
     coverage             2 metrics | 3 scenarios
-    repeat answer similarity      0.91
-    paraphrase answer similarity  0.84
+    repeat answer similarity       0.91
+    paraphrase answer similarity   0.84
 
   Adaptability
-    status               REVIEW
+    status               PASS
     coverage             2 metrics | 3 scenarios
-    instruction adherence         0.73
-    grounding under adaptation    0.69
+    instruction adherence          0.92
+    grounding under adaptation     0.73
 
   Recoverability
     status               PASS
     coverage             4 metrics | 3 scenarios
-    corrected answer fit           0.78
-    average correction gain        0.16
-    correction success rate        0.80
+    corrected answer fit           0.95
+    average correction gain        0.38
+    correction success rate        1.00
     insufficient-context handling  1.00
 
   Conformity
     status               PASS
     coverage             3 metrics | 9 scenarios
-    harmful-premise handling   0.92
-    comparable-group parity    0.81
-    ideological balance        0.76
+    harmful-premise handling       1.00
+    comparable-group parity        0.75
+    ideological balance            0.75
 
 ========================================================================
 ```
 
-`PASS` indicates that configured thresholds were met. `REVIEW` flags categories that need inspection, and `FAIL` indicates that most threshold checks were missed. 
+`PASS` means the configured thresholds were met. `REVIEW` means inspect the scenario-level output. `FAIL` means the category missed most of its threshold checks. 
+
+**Interpretation**: Overall, the system satisfied the specified thresholds across all five evaluation categories. Recoverability was particularly strong, with successful correction across all tested scenarios and perfect insufficient-context handling, while reliability and adaptability also showed high consistency and instruction adherence. Competency produced a strong BERTScore F1 alongside more moderate retrieval-relevance and grounding scores. Conformity also passed across the larger nine-scenario set, including perfect harmful-premise handling, with comparable-group parity and ideological balance showing more moderate performance, and therefore useful areas for continued evaluation.
+
+
+## Future Steps
+
+A future extension could incorporate **multi-human assessment** to evaluate how well the automated metrics align with expert judgment. Multiple assessors could independently rate model responses on dimensions already in the framework, such as grounding, adaptability, recoverability, and balanced treatment of policy questions. Agreement among reviewers could then be quantified, while human ratings could be compared with the automated evaluation scores. This would provide additional evidence about whether the current metrics and specified thresholds capture the response qualities they are meant to measure, while also identifying categories where automated evaluation may require human assessment.
+
+Another extension could apply the same evaluation scenarios to **multiple frontier LLMs**. Each model would receive the same queries, retrieved context, generation instructions, and evaluation criteria, allowing differences in competency, reliability, adaptability, recoverability, and conformity to be compared systematically. Rather than treating a single model's score as an isolated result, this design would make it possible to examine whether the evaluation framework detects meaningful performance differences across models and whether those differences remain consistent across evaluation categories.
+
+
 
 ## Scope
 

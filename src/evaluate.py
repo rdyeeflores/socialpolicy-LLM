@@ -1532,15 +1532,9 @@ def print_scorecard(summaries: Sequence[CategorySummary]) -> None:
 
     print("=" * 72)
     print(
-        "PASS means the configured practical thresholds were met. REVIEW means "
-        "inspect the scenario-level output. FAIL means the category missed most "
-        "of its threshold checks."
+        "`PASS` means the configured thresholds were met. `REVIEW` means inspect the scenario-level output. `FAIL` means the category missed most of its threshold checks."
     )
-    print(
-        "Coverage counts the representative scorecard indicators and the executed "
-        "project-specific scenarios. Full diagnostics remain available in JSON."
-    )
-
+    
 
 # Serializes every scenario result, category summary, and active threshold so a
 # saved report remains auditable and can be compared across evaluator runs.
