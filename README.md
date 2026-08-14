@@ -57,20 +57,20 @@ socialpolicy-LLM/
 │   ├── chat.py        # Generates document-grounded answers
 │   └── evaluate.py    # Runs the 5-category evaluation suite
 |
-├── .env.template      # Copied and used for API key
+├── .env_template      # Copied and used for API key
 ├── requirements.txt   
 └── README.md
 ```
 
 ## Installation
 
-Before running the project, install the required Python dependencies and create a local environment file for your API credentials. The .env.template file shows the required settings and the cp command copies it to a new .env file, where you can add your credentials securely.
+Before running the project, install the required Python dependencies and create a local environment file for your API credentials. The .env_template file shows the required settings and the cp command copies it to a new .env file, where you can add your credentials securely.
 
 ```bash
 git clone https://github.com/rdyeeflores/socialpolicy-LLM.git
 cd socialpolicy-LLM
 python -m pip install -r requirements.txt
-cp .env.template .env
+cp .env_template .env
 ```
 
 This system is configured by default to use **OpenAI GPT-5.6 Luna** through **OpenRouter**, providing fast and cost-effective access to a frontier LLM. Add your own API key to the `.env` file:
