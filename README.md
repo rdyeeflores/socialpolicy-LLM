@@ -11,11 +11,11 @@ The evaluation suite measures five categories:
 
 | Category | What it tests | Method |
 |---|---|---|
-| **Competency** | Retrieval relevance, answer grounding, concept coverage, and similarity to reference answers | Cosine similarity between query and retrieved-document embeddings (retrieval relevance); lexical overlap between the answer and retrieved context, stopword-filtered (grounding — a proxy for evidence use); ROUGE-L, BLEU, and BERTScore F1 computed jointly against reference answers rather than any single metric alone |
-| **Reliability** | Stability across repeated runs and consistency across paraphrased questions | Two independent stability checks: retrieval stability (Jaccard overlap of retrieved document IDs across repeated runs) and answer stability (embedding similarity of repeated, zero-temperature answers), plus a separate paraphrase-invariance check and an answer-length coefficient of variation |
-| **Adaptability** | Ability to follow audience, jurisdiction, and ethical-framing instructions without losing grounding | Weighted composite of required-instruction term coverage, preservation of the original question's core terms, and context grounding, so surface compliance can't substitute for an on-topic, grounded answer |
-| **Recoverability** | Ability to improve overly confident, one-sided, or unsupported answers after corrective feedback | Before/after correction compared with a weighted fit score (desired language, avoidance of forbidden overclaims, appropriate qualification, grounding); success requires fit above threshold *and* positive improvement, *and*, for one scenario built on a fact absent from the corpus, correct abstention rather than an invented statistic |
-| **Conformity** | Fair treatment across groups, balanced policy framing, and appropriate handling of harmful or unsupported premises | Matched-pair prompts (e.g. urban vs. rural, employed vs. unemployed; pro vs. con framings) scored on response-length parity, semantic similarity, and grounding balance between the pair; harmful or leading premises are separately checked for premise-challenging language rather than compliance |
+| **Competency** | Retrieval relevance, answer grounding, concept coverage, and similarity to reference answers | Cosine similarity between query and retrieved-document embeddings (retrieval relevance); stopword-filtered lexical overlap between the answer and retrieved context (grounding); BERTScore F1 against a reference answer (semantic accuracy) |
+| **Reliability** | Stability across repeated runs and consistency across paraphrased questions | Embedding similarity between answers generated from repeated, identical, zero-temperature runs (answer stability), and embedding similarity between the original answer and the answer to a paraphrased version of the question (paraphrase invariance) |
+| **Adaptability** | Ability to follow audience, jurisdiction, and ethical-framing instructions without losing grounding | Weighted composite of required-instruction term coverage, preservation of the original question's core terms, and semantic similarity between the answer and retrieved context (grounding) |
+| **Recoverability** | Ability to improve overly confident, one-sided, or unsupported answers after corrective feedback | A weighted fit score (desired language, avoidance of forbidden claims, qualification, grounding) computed before and after correction; success requires the corrected fit to clear a threshold without a meaningful drop from the original, and, for the one scenario built on a fact absent from the corpus, correct abstention instead of an invented statistic |
+| **Conformity** | Fair treatment across groups, balanced policy framing, and appropriate handling of harmful or unsupported premises | Comparable group pairs (e.g. urban vs. rural) are scored on relevance and parity; pro/con framing pairs are scored on response-length, grounding, and hedging-language parity; harmful or leading premises are scored separately on premise-challenging language |
 
 The framework does not force unrelated metrics into one score. It reports category-level indicators with `PASS`, `REVIEW`, or `FAIL` status, plus scenario-level diagnostics.
 
@@ -40,10 +40,10 @@ Scorecard + optional JSON / human-review CSV export
 The generation prompt requires the model to:
 
 - Use only retrieved context
+- Abstain when the context is insufficient
 - Separate evidence from interpretation
 - Avoid invented facts, statistics, or sources
 - Represent uncertainty when appropriate
-- Abstain when the context is insufficient
 
 
 ## Repository Structure
