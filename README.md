@@ -30,7 +30,7 @@ Local ChromaDB vector store
       ↓
 Top-k document retrieval
       ↓
-OpenRouter LLM response (API)
+LLM response (API)
       ↓
 Five-category evaluation suite
       ↓
@@ -50,21 +50,21 @@ The generation prompt requires the model to:
 
 ```text
 socialpolicy-LLM/
-├── corpus/          # Source document corpus
+├── corpus/            # Source document corpus
 |
 ├── src/
 │   ├── ingest.py      # Builds the local vector database
 │   ├── chat.py        # Generates document-grounded answers
 │   └── evaluate.py    # Runs the 5-category evaluation suite
 |
-├── .env_template      # Copied and used for API key
+├── .env_template      # Use for API key, provider, and model
 ├── requirements.txt   
 └── README.md
 ```
 
 ## Installation
 
-Before running the project, install the required Python dependencies and create a local environment file for your API credentials. The .env_template file shows the required settings and the cp command copies it to a new .env file, where you can add your credentials securely.
+Before running the project, install the required Python dependencies and create a local environment file for your API credentials and model settings. The .env_template file shows the required settings and the cp command copies it to a new .env file, where you can add your credentials securely.
 
 ```bash
 git clone https://github.com/rdyeeflores/socialpolicy-LLM.git
@@ -73,10 +73,12 @@ python -m pip install -r requirements.txt
 cp .env_template .env
 ```
 
-This system is configured by default to use **OpenAI GPT-5.6 Luna** through **OpenRouter**, providing fast and cost-effective access to a frontier LLM. Add your own API key to the `.env` file:
+This system defaults to **OpenAI GPT-5.6 Luna** through **OpenRouter**, providing fast and cost-effective access to a frontier LLM, but these can be changed. Add your own API key and (optionally) override the defaults in the `.env` file:
 
 ```env
-OPENROUTER_API_KEY=your_api_key_here
+API_KEY=your_api_key_here
+PROVIDER=https://openrouter.ai/api/v1
+MODEL=openai/gpt-5.6-luna
 ```
 
 Build a local vector database based on the source documents:
