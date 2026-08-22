@@ -8,7 +8,7 @@ import hashlib
 
 # NOTE: No API needed here due to local approach
 BASE_DIR = Path(__file__).resolve().parent.parent
-RAW_DIR = BASE_DIR / "data" / "raw"
+CORPUS_DIR = BASE_DIR / "corpus"
 DB_DIR = str(BASE_DIR / "chroma_db")
 COLLECTION = "policy_docs"
 
@@ -58,12 +58,12 @@ def make_doc_id(path, chunk_index):
 
 # Main ingestion flow
 def main():
-    print(f"Looking for files in: {RAW_DIR}\n")
+    print(f"Looking for files in: {CORPUS_DIR}\n")
 
-    files = list(RAW_DIR.glob("*"))
+    files = list(CORPUS_DIR.glob("*"))
 
     if not files:
-        print(f"No files found in {RAW_DIR}")
+        print(f"No files found in {CORPUS_DIR}")
         return
 
     for path in files:

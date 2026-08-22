@@ -25,27 +25,26 @@ COLLECTION = "policy_docs"
 # 🔑 USER SETUP REQUIRED
 # ==================================================
 # 1. Create a .env file in the project root
-# 2. Add your API key like this:
+# 2. Add your API key, provider, and model like this:
 #
-#    OPENROUTER_API_KEY=your_key_here
-#
-# 3. Optional: You may also switch model & provider:
-#    - Model: openai/gpt-5.6-luna (default)
-#    - Provider: OpenRouter (default)
+#    API_KEY=your_key_here
+#    PROVIDER=https://openrouter.ai/api/v1
+#    MODEL=openai/gpt-5.6-luna
+# 
 # ==================================================
 
 # Loading API key and LLM set-up
 load_dotenv(BASE_DIR / ".env")
 
-API_KEY = os.getenv("OPENROUTER_API_KEY")
-
-MODEL = "openai/gpt-5.6-luna"  # Change this to your preferred model if needed
+API_KEY = os.getenv("API_KEY")
+PROVIDER = os.getenv("PROVIDER", "https://openrouter.ai/api/v1")
+MODEL = os.getenv("MODEL", "openai/gpt-5.6-luna")
 
 if not API_KEY:
-    raise ValueError("Missing OPENROUTER_API_KEY in .env")
+    raise ValueError("Missing API_KEY in .env")
 
 llm = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
+    base_url=PROVIDER,
     api_key=API_KEY,
 )
 
@@ -180,7 +179,7 @@ Write a clear answer with:
 # Creates terminal interface
 def main():
     print("\n--- CHAT STARTED ---")
-    print('Begin with an initial question. The response will be grounded in the provided source documents. When done type "exit" or close the terminal.\n')
+    print('Begin with an initial question. Responses will be grounded on the provided corpus of source documents. When done type "exit" or close the terminal.\n')
     
     debug = True
 

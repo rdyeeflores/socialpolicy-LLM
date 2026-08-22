@@ -50,7 +50,7 @@ The generation prompt requires the model to:
 
 ```text
 socialpolicy-LLM/
-├── data/raw/          # Source document corpus
+├── corpus/          # Source document corpus
 |
 ├── src/
 │   ├── ingest.py      # Builds the local vector database

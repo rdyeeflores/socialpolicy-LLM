@@ -174,12 +174,9 @@ COLLECTION_NAME = "policy_docs"
 EMBED_MODEL = "all-MiniLM-L6-v2"
 N_RESULTS = int(os.getenv("EVAL_N_RESULTS", "5"))
 
-OPENROUTER_BASE = "https://openrouter.ai/api/v1"
+PROVIDER = os.getenv("PROVIDER", "https://openrouter.ai/api/v1")
 
-LLM_MODEL = os.getenv(
-    "OPENROUTER_MODEL",
-    "openai/gpt-5.6-luna",
-)
+LLM_MODEL = os.getenv("MODEL", "openai/gpt-5.6-luna")
 
 REPEAT_RUNS = int(os.getenv("EVAL_REPEAT_RUNS", "3"))
 SLEEP_SECONDS = float(os.getenv("EVAL_SLEEP_SECONDS", "0.35"))
@@ -522,10 +519,10 @@ def get_collection():
 def get_llm_client() -> Optional["OpenAI"]:
     if not _LLM_OK:
         return None
-    api_key = os.getenv("OPENROUTER_API_KEY")
+    api_key = os.getenv("API_KEY")
     if not api_key:
         return None
-    return OpenAIRuntime(api_key=api_key, base_url=OPENROUTER_BASE)
+    return OpenAIRuntime(api_key=api_key, base_url=PROVIDER)
 
 # Core retrieval step: embed the question, query Chroma, preserve identifiers and
 # distances for reliability metrics, and assemble source-labelled context for the
@@ -1602,7 +1599,7 @@ def main() -> None:
     client = get_llm_client()
 
     if client is None:
-        print("[ERROR] OPENROUTER_API_KEY is missing or the OpenAI package is unavailable.")
+        print("[ERROR] API_KEY is missing or package is unavailable.")
         sys.exit(1)
 
     if embedder is None or collection is None:
