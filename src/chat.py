@@ -1,7 +1,15 @@
 
 # Set-up
 import os
+import warnings
 from pathlib import Path
+
+warnings.filterwarnings(
+    "ignore",
+    message=r".*clean_up_tokenization_spaces.*",
+    category=FutureWarning,
+    module=r"transformers\.tokenization_utils_base",
+)
 
 # Main tools (local vector db, API, openai, transformer)
 import chromadb
@@ -171,16 +179,13 @@ Write a clear answer with:
 
 # Creates terminal interface
 def main():
-    print("Policy LLM")
-    print("Type 'exit' to stop.")
-    print("Type 'debug off' to hide retrieved context previews.")
-    print("Type 'debug on' to show retrieved context previews.")
-    print()
-
+    print("\n--- CHAT STARTED ---")
+    print('Begin with an initial question. The response will be grounded in the provided source documents. When done type "exit" or close the terminal.\n')
+    
     debug = True
 
     while True:
-        question = input("You ('exit' to stop): ").strip()
+        question = input("You (type question): ").strip()
 
         if not question:
             continue

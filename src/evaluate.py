@@ -77,7 +77,7 @@ import time
 import warnings
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Optional, Sequence
+from typing import Any, Optional, Sequence, TYPE_CHECKING
 
 from dotenv import load_dotenv
 
@@ -133,11 +133,14 @@ except ImportError:
     SentenceTransformer = None
     _RAG_OK = False
     print("[WARN] chromadb / sentence-transformers not available.")
-try:
+if TYPE_CHECKING:
     from openai import OpenAI
+
+try:
+    from openai import OpenAI as OpenAIRuntime
     _LLM_OK = True
 except ImportError:
-    OpenAI = None
+    OpenAIRuntime = None
     _LLM_OK = False
     print("[WARN] openai package not installed.")
 
@@ -522,7 +525,7 @@ def get_llm_client() -> Optional["OpenAI"]:
     api_key = os.getenv("OPENROUTER_API_KEY")
     if not api_key:
         return None
-    return OpenAI(api_key=api_key, base_url=OPENROUTER_BASE)
+    return OpenAIRuntime(api_key=api_key, base_url=OPENROUTER_BASE)
 
 # Core retrieval step: embed the question, query Chroma, preserve identifiers and
 # distances for reliability metrics, and assemble source-labelled context for the
