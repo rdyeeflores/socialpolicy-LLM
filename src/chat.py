@@ -1,9 +1,31 @@
+"""
+chat.py — Interactive RAG chat interface for socialpolicy-LLM
+============================================================================
+
+Purpose
+-------
+Terminal chat loop that answers questions grounded in source docs:
+- Uses ChromaDB collection (top-5 chunks, all-MiniLM-L6-v2). 
+- Calls an OpenAI-compatible LLM (OpenRouter by default, temperature 0.3)
+- Requires API_KEY in .env
+- Returns a fixed fallback if no context is retrieved
+
+Usage
+-----
+    python src/chat.py
+    
+"""
 
 # Set-up
 import os
 import warnings
 from pathlib import Path
+import chromadb
+from dotenv import load_dotenv
+from openai import OpenAI
+from sentence_transformers import SentenceTransformer
 
+# Silence FutureWarnings from transformers library
 warnings.filterwarnings(
     "ignore",
     message=r".*clean_up_tokenization_spaces.*",
@@ -11,29 +33,23 @@ warnings.filterwarnings(
     module=r"transformers\.tokenization_utils_base",
 )
 
-# Main tools (local vector db, API, openai, transformer)
-import chromadb
-from dotenv import load_dotenv
-from openai import OpenAI
-from sentence_transformers import SentenceTransformer
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 DB_DIR = str(BASE_DIR / "chroma_db")
 COLLECTION = "policy_docs"
 
-# ==================================================
-# 🔑 USER SETUP REQUIRED
-# ==================================================
-# 1. Create a .env file in the project root
+# =========================================================
+# 🔑 USER SET-UP REQUIRED 
+# =========================================================
+# 1. Before chatting, create a .env file in the root folder
 # 2. Add your API key, provider, and model like this:
 #
 #    API_KEY=your_key_here
 #    PROVIDER=https://openrouter.ai/api/v1
 #    MODEL=openai/gpt-5.6-luna
 # 
-# ==================================================
+# =========================================================
 
-# Loading API key and LLM set-up
+# Loading API key and LLM set-up (with openrouter & openai defaults)
 load_dotenv(BASE_DIR / ".env")
 
 API_KEY = os.getenv("API_KEY")
@@ -53,8 +69,9 @@ embedder = SentenceTransformer("all-MiniLM-L6-v2")
 db = chromadb.PersistentClient(path=DB_DIR)
 collection = db.get_or_create_collection(COLLECTION)
 
-# Retrieval specifications
+# Retrieval specifications (convert questions to embeddings, get top n chunks)
 def retrieve(question, n=5):
+
     query_embedding = embedder.encode(question).tolist()
 
     results = collection.query(
@@ -97,8 +114,9 @@ def retrieve(question, n=5):
 
     return "\n\n---\n\n".join(context_parts)
 
-# Previewing context
+# Previewing context (debug helper)
 def preview_context(context, max_chars=400, max_chunks=2):
+
     parts = context.split("\n\n---\n\n")[:max_chunks]
     short = "\n\n---\n\n".join(parts)
 
@@ -107,12 +125,13 @@ def preview_context(context, max_chars=400, max_chunks=2):
 
     return short
 
-# MAIN ANSWERING FUNCTION
+# Answering questions with LLM and RAG logic (keep debug on by default)
 def ask(question, debug=True):
+
     context = retrieve(question)
 
     if debug:
-        print("\n--- CONTEXT PREVIEW ---")
+        print("--- CONTEXT PREVIEW ---")
         print(preview_context(context) if context else "[No context retrieved]")
         print("--- END PREVIEW ---\n")
 
@@ -140,14 +159,14 @@ Context:
 {context}
 
 Write a clear answer with:
-1. A direct answer
-2. Key evidence from the context
+1. A direct answer first
+2. Key evidence from the given context
 3. Any limitations or uncertainty
 """,
         },
     ]
 
-    # Calling the LLM
+    # Sending the prompt to the LLM (temperature 0.3 for more deterministic answers)
     try:
         response = llm.chat.completions.create(
             model=MODEL,
@@ -176,10 +195,11 @@ Write a clear answer with:
     except Exception as e:
         return f"LLM request failed: {e}"
 
-# Creates terminal interface
+# MAIN: Create chat loop via terminal
 def main():
+
     print("\n--- CHAT STARTED ---")
-    print('Begin with an initial question. Responses will be grounded on the provided corpus of source documents. When done type "exit" or close the terminal.\n')
+    print('Begin with an initial question. Responses will be grounded in the provided source documents. When done type "exit" or close the terminal.\n')
     
     debug = True
 
@@ -207,6 +227,7 @@ def main():
         print()
         print(ask(question, debug=debug))
         print()
+
 
 # Script entry point
 if __name__ == "__main__":

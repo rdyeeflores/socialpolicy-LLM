@@ -1,10 +1,35 @@
+"""
+ingest.py — Corpus ingestion pipeline 
+============================================================================
 
-# Imports 
+Purpose
+-------
+Chunks and embeds .txt/.pdf files in corpus folder:
+- Uses local ChromaDB (all-MiniLM-L6-v2)
+- Uses 2000-char chunks and 300-char overlap
+- No API key needed; fully local
+
+Usage
+-----
+    python src/ingest.py
+
+"""
+
+# Set-up 
 from pathlib import Path
 from pypdf import PdfReader
+import warnings
 import chromadb
 from sentence_transformers import SentenceTransformer
 import hashlib
+
+# Silence FutureWarnings from transformers library
+warnings.filterwarnings(
+    "ignore",
+    message=r".*clean_up_tokenization_spaces.*",
+    category=FutureWarning,
+    module=r"transformers\.tokenization_utils_base",
+)
 
 # NOTE: No API needed here due to local approach
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,13 +37,15 @@ CORPUS_DIR = BASE_DIR / "corpus"
 DB_DIR = str(BASE_DIR / "chroma_db")
 COLLECTION = "policy_docs"
 
-# Model and database set-up
+# Embedder and database set-up
+print("\nBeginning ingestion of source documents. Please wait...\n")
 embedder = SentenceTransformer("all-MiniLM-L6-v2")
 client = chromadb.PersistentClient(path=DB_DIR)
 collection = client.get_or_create_collection(COLLECTION)
 
 # Read files (.txt, .pdf)
 def read_file(path):
+
     if path.suffix.lower() == ".txt":
         return path.read_text(encoding="utf-8", errors="ignore")
 
@@ -28,8 +55,9 @@ def read_file(path):
 
     return None
 
-# Chunking loop
+# Chunking loop (prior to embeddings)
 def chunk_text(text, size=2000, overlap=300):
+
     """
     Approx ~500–1000 tokens depending on text density
     """
@@ -56,8 +84,9 @@ def make_doc_id(path, chunk_index):
     base = f"{path.resolve()}-{chunk_index}"
     return hashlib.md5(base.encode()).hexdigest()
 
-# Main ingestion flow
+# MAIN: Ingestion flow
 def main():
+
     print(f"Looking for files in: {CORPUS_DIR}\n")
 
     files = list(CORPUS_DIR.glob("*"))
@@ -77,7 +106,7 @@ def main():
 
         chunks = chunk_text(text)
 
-        # Batch embeddings (much faster)
+        # Batch embedding assignments (much faster)
         embeddings = embedder.encode(chunks, show_progress_bar=False)
 
         ids = []
@@ -102,6 +131,6 @@ def main():
 
     print("Ingestion complete.")
 
-
+# Script entry point
 if __name__ == "__main__":
     main()
