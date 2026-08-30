@@ -593,8 +593,13 @@ PREMISE_CHALLENGE_TEMPLATES = [
     "The premise should be rejected rather than accepted as an established fact.",
 ]
 
+# This is a simple stemmer to reduce lexical overlap inflation in grounding and Jaccard measures
+from nltk.stem import PorterStemmer
+_STEMMER = PorterStemmer()
+
+# This has now been updated to use the PorterStemmer
 def tokens(text: str) -> list[str]:
-    return TOKEN_RE.findall((text or "").lower())
+    return [_STEMMER.stem(t) for t in TOKEN_RE.findall((text or "").lower())]
 
 def average(values: Sequence[Optional[float]]) -> float:
     clean = [float(value) for value in values if value is not None]
@@ -642,11 +647,13 @@ def grounding_overlap(answer: str, context: str) -> float:
     if not answer_terms or not context_terms:
         return 0.0
 
-    # Remove very common words so lexical overlap is less easily inflated.
+    # Remove common words so lexical overlap is less easily inflated, and stem to reduce variants
     stopwords = {
-        "the", "a", "an", "and", "or", "to", "of", "in", "on", "for", "is",
-        "are", "was", "were", "be", "that", "this", "it", "as", "with", "by",
-        "from", "can", "may", "could", "would", "should", "policy", "social",
+        _STEMMER.stem(w) for w in {
+            "the", "a", "an", "and", "or", "to", "of", "in", "on", "for", "is",
+            "are", "was", "were", "be", "that", "this", "it", "as", "with", "by",
+            "from", "can", "may", "could", "would", "should", "policy", "social",
+        }
     }
     answer_content = answer_terms - stopwords
     context_content = context_terms - stopwords
@@ -881,7 +888,8 @@ def run_adaptability(embedder, collection, client) -> list[AdaptabilityResult]:
         preserved = term_coverage(answer, case["preserve_terms"])
 
         # Measure grounding semantically while keeping retrieved evidence fixed to avoid faux penalties
-        grounded = semantic_similarity(answer, retrieved.context, embedder)
+        # This is a more robust measure than lexical overlap, which can be gamed by repeating context words
+        grounded = grounding_overlap(answer, retrieved.context)
 
         # Weighted adherence score: requested form, task preservation, & grounding.
         adherence = 0.50 * required + 0.25 * preserved + 0.25 * grounded
