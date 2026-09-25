@@ -1,15 +1,15 @@
 # socialpolicy-LLM
 
-Evaluation is essential for building trustworthy AI systems, while retrieval-augmented generation (RAG) helps ground responses in source material. This Python project combines these two components to create a **customizable system built around a frontier LLM** for answering social policy questions and evaluating whether those answers are grounded, consistent, adaptable, correctable, and responsible. 
+Evaluation is essential for building trustworthy AI systems, while retrieval-augmented generation (RAG) helps ground responses in source material. This Python project combines these two components to create a **customizable system built around a frontier LLM** for answering social policy questions and evaluating whether those answers are grounded in evidence, consistent upon repeated queries, adaptable to change and correction, and aligned with defined expectations for responsible behavior. 
 
-This project **emphasizes frontier LLM evaluation**, not just answer generation. It demonstrates how AI responses can be assessed using automated metrics, targeted benchmarks and scenarios, configurable thresholds, structured reporting, and optional human review.
+This project **emphasizes frontier LLM evaluation**, not just answer generation. It demonstrates how AI responses can be assessed using automated metrics, targeted scenarios, configurable thresholds, structured reporting, and optional human review.
 
 
 ## Evaluation Framework
 
-The evaluation suite measures five categories:
+The evaluation suite measures five constructs related to response quality, with each represented by a different set of metrics and targeted scenarios:
 
-| Category | What it tests | Method |
+| Construct | Operational Definition | Indicators |
 |---|---|---|
 | **Competency** | Retrieval relevance, answer grounding, concept coverage, and similarity to reference answers | Cosine similarity between query and retrieved-document embeddings (retrieval relevance); stopword-filtered lexical overlap between the answer and retrieved context (grounding); BERTScore F1 against a reference answer (semantic accuracy) |
 | **Reliability** | Stability across repeated runs and consistency across paraphrased questions | Embedding similarity between answers generated from repeated, identical, zero-temperature runs (answer stability), and embedding similarity between the original answer and the answer to a paraphrased version of the question (paraphrase invariance) |
@@ -17,7 +17,7 @@ The evaluation suite measures five categories:
 | **Recoverability** | Ability to improve overly confident, one-sided, or unsupported answers after corrective feedback | A weighted fit score (desired language, avoidance of forbidden claims, qualification, groundedness) computed before and after correction; success requires corrected fit to clear a threshold without a meaningful drop, except for one scenario where omitted information produces abstention instead |
 | **Conformity** | Fair treatment across groups, balanced policy framing, and appropriate handling of harmful or unsupported premises | Comparable group pairs are scored on relevance and grounding (parity); pro/con framing pairs are scored on response-length, grounding, and hedging-language (balance); harmful or leading premises are scored separately on premise-challenging language |
 
-The framework does not force unrelated metrics into one score. It reports category-level indicators with `PASS`, `REVIEW`, or `FAIL` status, plus scenario-level diagnostics.
+Each construct is operationalized through defined indicators and targeted scenarios, and decision rules use that evidence to assign `PASS`, `REVIEW`, or `FAIL`.
 
 ## System Design
 
@@ -32,7 +32,7 @@ Top-k document retrieval
       ↓
 LLM response (API)
       ↓
-Five-category evaluation suite
+Evaluation suite
       ↓
 Scorecard + optional JSON / human-review CSV export
 ```
@@ -55,7 +55,7 @@ socialpolicy-LLM/
 ├── src/
 │   ├── ingest.py      # Builds the local vector database
 │   ├── chat.py        # Generates document-grounded answers
-│   └── evaluate.py    # Runs the 5-category evaluation suite
+│   └── evaluate.py    # Runs evaluation suite
 |
 ├── .env_template      # Use for API key, provider, and model
 ├── requirements.txt   
