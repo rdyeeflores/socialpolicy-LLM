@@ -2,12 +2,12 @@
 
 Evaluation is essential for building trustworthy AI systems, while retrieval-augmented generation (RAG) helps ground responses in source material. This Python project combines these two components to create a **customizable system built around a frontier LLM** for answering social policy questions and evaluating whether those answers are grounded in evidence, consistent upon repeated queries, adaptable to change and correction, and aligned with defined expectations for responsible behavior. 
 
-This project **emphasizes frontier LLM evaluation**, not just answer generation. It demonstrates how AI responses can be assessed using automated metrics, targeted scenarios, configurable thresholds, structured reporting, and optional human review.
+This project **emphasizes frontier LLM evaluation**, using concepts from psychometrics and measurement science to approach LLM evaluation as a multidimensional measurement problem. It demonstrates how AI responses can be assessed using automated metrics, targeted scenarios, configurable thresholds, structured reporting, and optional human review to assess meaningful constructs related to LLM response quality. 
 
 
 ## Evaluation Framework
 
-The evaluation suite measures five constructs related to response quality, with each represented by a different set of metrics and targeted scenarios:
+The evaluation suite measures five different constructs related to response quality, with each represented by a different set of metrics and targeted scenarios. The framework is informed by a measurement-science perspective: each construct represents a distinct component of system behavior operationalized through a set of observable evaluation criteria.
 
 | Construct | Operational Definition | Indicators |
 |---|---|---|
